@@ -15,11 +15,20 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
     private boolean isPlaying;
     private IceCreamCar icecreamCar;
     private kid kid;
+    private  Men men;
     private Paint paint;
-     private Paint paintStart;
+    private Paint paintStart;
     private Canvas canvas;
     private SurfaceHolder holder;
     private Thread gameplayThread = null;
+    private  int times=0;
+    private int score=0;
+    private kid[] kids = new  kid[5];
+    private Cloud[] clouds= new  Cloud[3];
+    boolean active=false;
+    boolean menTouched=false;
+    int screenWith=0;
+    int level=1;
 
     /**
      * Contructor
@@ -27,13 +36,21 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
      */
     public GameSurfaceView(Context context, float screenWith, float screenHeight) {
         super(context);
+        this.screenWith=(int)screenWith;
         icecreamCar = new IceCreamCar(context, screenWith, screenHeight);
-        kid = new kid(context, screenWith, screenHeight);
         paint = new Paint();
         paintStart= new Paint();
         paintStart.setTextSize(100);
         holder = getHolder();
         isPlaying = true;
+        for (int i=0;i<5;i=i+1){
+         kids[i]= new kid(context, screenWith, screenHeight);
+        }
+        for (int i=0;i<3;i=i+1){
+            clouds[i]= new Cloud(context, screenWith, screenHeight);
+        }
+            men= new Men(context, screenWith, screenHeight);
+
     }
 
     /**
@@ -49,34 +66,59 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
     }
 
     private void updateInfo() {
-        icecreamCar.updateInfo ();
-        kid.updateInfo(icecreamCar.getPositionX(),icecreamCar.getPositionY());
+        if(active){
+            icecreamCar.updateInfo();
+            for(int i=0; i < times/100 ;i=i+1) {
+                this.score+= kids[i].updateInfo(icecreamCar.getPositionX(), icecreamCar.getPositionY(),level);
+                if(this.score<0){
+                    active=false;
+                    score=0;
+                }
+            }
+            for(int i=0; i < times/200 ;i=i+1) {
+                clouds[i].updateInfo();
+            }
+                this.score+= men.updateInfo(icecreamCar.getPositionX(), icecreamCar.getPositionY(),level);
 
-        if((float)Math.random()*10==1){
-          new kid(super.getContext(), 10, 10);
+
+        }else {
+            score=0;
+            level=0;
+            times=0;
+                men.setPositionX(screenWith);
+
+            for (int i=0;i<5;i=i+1){
+                kids[i].setPositionX(screenWith);
+            }
+        }
+        if((score/20)+1>level){
+            level=(score/20)+1;
         }
     }
-
-
-
-    
 
     private void paintFrame() {
         if (holder.getSurface().isValid()){
+            if(times<500){
+                times=times+1;
+            }
             canvas = holder.lockCanvas();
             canvas.drawColor(Color.CYAN);
-            canvas.drawText("Score "+kid.score+"", 40,40,paint);
-            if(!kid.started){canvas.drawText(kid.texto, 650,400,paint);}
+            canvas.drawText("Score "+this.score+"", 40,40,paint);
+            canvas.drawText("Level "+this.level+"", this.screenWith-400,40,paint);
+            if(!active){canvas.drawText("You lose", 650,400,paint);}
             paint.setTextSize(40);
-
             canvas.drawBitmap(icecreamCar.getSpriteIcecreamCar(),icecreamCar.getPositionX(),icecreamCar.getPositionY(),paint);
+            for(int i=0;i<times/100;i=i+1) {
+                canvas.drawBitmap(kids[i].getSpritekid(),kids[i].getPositionX(),kids[i].getPositionY(),paint);
+            }
+            for(int i=0;i<times/200;i=i+1) {
+                canvas.drawBitmap(clouds[i].getSpritecloud(),clouds[i].getPositionX(),clouds[i].getPositionY(),paint);
+            }
+                canvas.drawBitmap(men.getSpritemen(),men.getPositionX(),men.getPositionY(),paint);
 
-            canvas.drawBitmap(kid.getSpritekid(),kid.getPositionX(),kid.getPositionY(),paint);
             holder.unlockCanvasAndPost(canvas);
         }
-
     }
-
 
     public void pause() {
         isPlaying = false;
@@ -86,8 +128,6 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
             e.printStackTrace();
         }
     }
-
-
 
     public void resume() {
 
@@ -103,14 +143,12 @@ public class GameSurfaceView extends SurfaceView implements Runnable {
      */
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
-        kid.started=true;
+        this.active=true;
         switch (motionEvent.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_UP:
-                System.out.println("TOUCH UP - STOP JUMPING");
                 icecreamCar.setJumping(false);
                 break;
             case MotionEvent.ACTION_DOWN:
-                System.out.println("TOUCH DOWN - JUMP");
                 icecreamCar.setJumping(true);
                 break;
         }

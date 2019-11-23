@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-
+import  java.util.*;
 public class kid {
 
     public static final float INIT_X =100;
@@ -14,7 +14,6 @@ public class kid {
     public static final float GRAVITY_FORCE=10;
     private final int MIN_SPEED = 1;
     private final int MAX_SPEED = 20;
-    int score=0;
     private float maxY;
     private float maxX;
     int kidPased=0;
@@ -22,10 +21,7 @@ public class kid {
     private float positionX;
     private float positionY;
     private Bitmap spritekid;
-    boolean started=false;
-    String texto="Touch to start";
-    private int level=1;
-
+    private int orientation=-1;
     public kid(Context context, float screenWidth, float screenHeigth){
 
         speed = 1;
@@ -37,6 +33,12 @@ public class kid {
 
         this.maxX = screenWidth - (spritekid.getWidth()/2);
         this.maxY = screenHeigth - spritekid.getHeight();
+
+        Random random = new Random();
+        if(random.nextBoolean()){
+            orientation=1;
+        }
+
     }
 
     public kid(Context context, float initialX, float initialY, float screenWidth, float screenHeigth){
@@ -97,38 +99,36 @@ public class kid {
     /**
      * Control the position and behaviour of the icecream car
      */
-    public void updateInfo (float a, float b) {
-        if(this.started){
-            if(this.score%10==0&&(level<this.score/10)){
-                level=this.score/10;
+    public int updateInfo (float a, float b, int level) {
+           this.positionX-=10;
+            if(level>4 ){
+                this.positionY+=(orientation* (level));
             }
-            speed += 5*level;
-            this.positionX-=10;
-
-
-            if(this.score<0){
-                started=false;
-                score=0;
-                texto="You lose";
-
+            if(positionY<0){
+                orientation=1;
+            }
+            if(positionY>maxY){
+                orientation=-1;
             }
 
-            if(a+60>this.positionX && a-60<this.positionX ){
+
+            if(a+60>this.positionX && a-60<this.positionX){
                 if(b+60>this.positionY && b-60<this.positionY ){
-                    this.score+=1;
+
                     this.positionX= this.maxX;
                     this.positionY =  (float)Math.random()*400;
+                    return 1;
+
                 }
             }
 
+
             if(this.positionX<0){
-                this.score-=1;
                 this.positionX= this.maxX;
                 this.positionY =  (float)Math.random()*400;
+                return-1;
             }
 
-
-        }
-
+        return 0;
     }
 }

@@ -4,13 +4,13 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-public class Cloud {
+public class Men {
 
 
     public static final float INIT_X =100;
     public static final float INIT_Y =100;
-    public static final int SPRITE_SIZE_WIDTH =120;
-    public static final int SPRITE_SIZE_HEIGTH=100;
+    public  int SPRITE_SIZE_WIDTH =120;
+    public  int SPRITE_SIZE_HEIGTH=100;
     public static final float GRAVITY_FORCE=10;
     private final int MIN_SPEED = 1;
     private final int MAX_SPEED = 20;
@@ -21,34 +21,34 @@ public class Cloud {
     private float speed = 0;
     private float positionX;
     private float positionY;
-    private Bitmap spritecloud;
+    private Bitmap spritemen;
     private boolean primeraVez;
 
 
-    public Cloud(Context context, float screenWidth, float screenHeigth){
+    public Men(Context context, float screenWidth, float screenHeigth){
 
         speed = 1;
         positionX = screenWidth-200;
         positionY = (screenWidth/2)-200;
         //Getting bitmap from resource
-        Bitmap originalBitmap= BitmapFactory.decodeResource(context.getResources(), R.drawable.cloud);
-        spritecloud  = Bitmap.createScaledBitmap(originalBitmap, SPRITE_SIZE_WIDTH, SPRITE_SIZE_HEIGTH, false);
+        Bitmap originalBitmap= BitmapFactory.decodeResource(context.getResources(), R.drawable.men);
+        spritemen  = Bitmap.createScaledBitmap(originalBitmap, SPRITE_SIZE_WIDTH, SPRITE_SIZE_HEIGTH, false);
 
-        this.maxX = screenWidth - (spritecloud.getWidth()/2);
-        this.maxY = screenHeigth - spritecloud.getHeight();
+        this.maxX = screenWidth - (spritemen.getWidth()/2);
+        this.maxY = screenHeigth - spritemen.getHeight();
     }
 
-    public Cloud(Context context, float initialX, float initialY, float screenWidth, float screenHeigth){
+    public Men(Context context, float initialX, float initialY, float screenWidth, float screenHeigth){
 
         speed = 1;
         positionX = initialX;
         positionY = initialY;
 
-        Bitmap originalBitmap= BitmapFactory.decodeResource(context.getResources(), R.drawable.cloud);
-        spritecloud  = Bitmap.createScaledBitmap(originalBitmap, SPRITE_SIZE_WIDTH, SPRITE_SIZE_HEIGTH, false);
+        Bitmap originalBitmap= BitmapFactory.decodeResource(context.getResources(), R.drawable.men);
+        spritemen  = Bitmap.createScaledBitmap(originalBitmap, SPRITE_SIZE_WIDTH, SPRITE_SIZE_HEIGTH, false);
 
-        this.maxX = screenWidth - (spritecloud.getWidth()/2);
-        this.maxY = screenHeigth - spritecloud.getHeight();
+        this.maxX = screenWidth - (spritemen.getWidth()/2);
+        this.maxY = screenHeigth - spritemen.getHeight();
 
     }
 
@@ -84,28 +84,36 @@ public class Cloud {
         this.positionY = positionY;
     }
 
-    public Bitmap getSpritecloud() {
-        return spritecloud;
+    public Bitmap getSpritemen() {
+        return spritemen;
     }
 
-    public void setSpritecloud(Bitmap spritecloud) {
-        this.spritecloud = spritecloud;
+    public void setSpritemen(Bitmap spritemen) {
+        this.spritemen = spritemen;
     }
 
 
     /**
      * Control the position and behaviour of the icecream car
      */
-    public void updateInfo () {
+    public int updateInfo (float a, float b,int level) {
 
-         this.positionX-=2;
-        System.out.println(this.positionX);
+         this.positionX-=1*level;
+         this.SPRITE_SIZE_HEIGTH*=(level);
+         this.SPRITE_SIZE_WIDTH*=(level);
          speed+=5;
         if(this.positionX<0){
             this.positionX= this.maxX;
             this.positionY =  (float)Math.random()*400;
-
         }
+        if(a+60>this.positionX && a-60<this.positionX ){
+            if(b+60>this.positionY && b-60<this.positionY ){
+                this.positionX= this.maxX;
+                this.positionY =  (float)Math.random()*400;
+                return -10000;
+            }
+        }
+        return 0;
     }
 }
 
